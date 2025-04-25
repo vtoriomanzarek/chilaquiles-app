@@ -1,0 +1,68 @@
+/* Bootstrap styles */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Custom styles */
+body {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #fff8e1, #fffdf7);
+}
+
+/* Estructura de página */
+.page-container {
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 70px; /* Altura aproximada del footer */
+}
+
+.content-wrap {
+  padding-bottom: 20px;
+}
+
+.footer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Transiciones entre pasos */
+.step-transition-enter {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.step-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.step-transition-exit {
+  opacity: 1;
+}
+
+.step-transition-exit-active {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 300ms, transform 300ms;
+}
