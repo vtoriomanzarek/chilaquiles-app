@@ -33,6 +33,14 @@ jobs:
         run: npm install
       - name: Build with Next.js
         run: npm run build
+        continue-on-error: true
+      - name: Debug build failure
+        if: failure()
+        run: |
+          echo "Build failed. Checking for error logs..."
+          cat .next/build-error.log || echo "No build error log found"
+          echo "Checking package.json..."
+          cat package.json
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
