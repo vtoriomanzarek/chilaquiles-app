@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import AdminLayout from '../components/AdminLayout'
 
 interface OrderItem {
   id: string
@@ -32,7 +32,12 @@ export default function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('/api/orders')
+        const token = localStorage.getItem('authToken')
+        const response = await fetch('/api/orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
         if (!response.ok) {
           throw new Error('Error al obtener los pedidos')
         }
@@ -49,40 +54,29 @@ export default function OrdersPage() {
     fetchOrders()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="container py-5">
-        <h1 className="mb-4">Pedidos</h1>
+  // El contenido dentro del AdminLayout
+  const renderContent = () => {
+    if (loading) {
+      return (
         <div className="d-flex justify-content-center">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
         </div>
-      </div>
-    )
-  }
+      )
+    }
 
-  if (error) {
-    return (
-      <div className="container py-5">
-        <h1 className="mb-4">Pedidos</h1>
+    if (error) {
+      return (
         <div className="alert alert-danger" role="alert">
           {error}
         </div>
-      </div>
-    )
-  }
+      )
+    }
 
-  return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Pedidos</h1>
-        <Link href="/" className="btn btn-outline-primary">
-          Volver al inicio
-        </Link>
-      </div>
+    return (
 
-      {orders.length === 0 ? (
+      orders.length === 0 ? (
         <div className="alert alert-info">
           No hay pedidos registrados.
         </div>
@@ -121,7 +115,13 @@ export default function OrdersPage() {
             </div>
           ))}
         </div>
-      )}
-    </div>
+      )
+    )
+  }
+
+  return (
+    <AdminLayout title="Pedidos">
+      {renderContent()}
+    </AdminLayout>
   )
 }

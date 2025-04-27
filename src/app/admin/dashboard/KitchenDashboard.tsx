@@ -50,6 +50,20 @@ export default function KitchenDashboard({ data }: KitchenDashboardProps) {
   console.log('Pedidos en preparación (PREPARING):', preparingOrders.length);
   console.log('Pedidos listos (READY):', readyOrders.length);
   
+  // Estado para mostrar notificaciones
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error' | 'info', visible: boolean}>(
+    {message: '', type: 'info', visible: false}
+  );
+
+  // Función para mostrar notificaciones
+  const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
+    setNotification({message, type, visible: true});
+    // Ocultar la notificación después de 3 segundos
+    setTimeout(() => {
+      setNotification(prev => ({...prev, visible: false}));
+    }, 3000);
+  };
+  
   // Función para marcar un pedido como en preparación
   const handleMarkAsPreparing = async (orderId: string) => {
     if (processingOrders.includes(orderId)) return;
@@ -60,16 +74,16 @@ export default function KitchenDashboard({ data }: KitchenDashboardProps) {
       const success = await markOrderAsPreparing(orderId);
       
       if (success) {
+        // Mostrar notificación de éxito
+        showNotification('Pedido marcado como en preparación correctamente', 'success');
         // Recargar los datos
         setRefreshTrigger(prev => prev + 1);
-        // Notificar al usuario
-        alert('Pedido marcado como en preparación correctamente');
       } else {
-        alert('Error al marcar el pedido como en preparación');
+        showNotification('Error al marcar el pedido como en preparación', 'error');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al actualizar el estado del pedido');
+      showNotification('Error al actualizar el estado del pedido', 'error');
     } finally {
       setProcessingOrders(prev => prev.filter(id => id !== orderId));
     }
@@ -85,16 +99,16 @@ export default function KitchenDashboard({ data }: KitchenDashboardProps) {
       const success = await markOrderAsReady(orderId);
       
       if (success) {
+        // Mostrar notificación de éxito
+        showNotification('Pedido marcado como listo para entregar correctamente', 'success');
         // Recargar los datos
         setRefreshTrigger(prev => prev + 1);
-        // Notificar al usuario
-        alert('Pedido marcado como listo para entregar correctamente');
       } else {
-        alert('Error al marcar el pedido como listo');
+        showNotification('Error al marcar el pedido como listo', 'error');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al actualizar el estado del pedido');
+      showNotification('Error al actualizar el estado del pedido', 'error');
     } finally {
       setProcessingOrders(prev => prev.filter(id => id !== orderId));
     }
@@ -102,6 +116,14 @@ export default function KitchenDashboard({ data }: KitchenDashboardProps) {
   
   return (
     <div>
+      {/* Notificación */}
+      {notification.visible && (
+        <div className={`alert alert-${notification.type === 'success' ? 'success' : notification.type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`}>
+          {notification.message}
+          <button type="button" className="btn-close" onClick={() => setNotification(prev => ({...prev, visible: false}))}></button>
+        </div>
+      )}
+      
       <div className="alert alert-info">
         <h4 className="alert-heading">Cocina</h4>
         <p>Bienvenido al panel de cocina. Aquí puedes ver los pedidos pendientes y marcarlos como preparados.</p>
