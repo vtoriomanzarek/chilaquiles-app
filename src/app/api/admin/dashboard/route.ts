@@ -2,11 +2,38 @@ import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
-const prisma = new PrismaClient()
+// Usar una instancia global de Prisma para evitar múltiples conexiones durante el despliegue
+let prisma: PrismaClient
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient()
+} else {
+  // En desarrollo, reutilizar la conexión para evitar demasiadas conexiones
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient()
+  }
+  prisma = (global as any).prisma
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'chilaquiles-secret-key-change-in-production'
 
 export async function GET(request: Request) {
   try {
+    // Durante el build de Vercel, devolver datos simulados para evitar errores
+    if (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_BUILD_STEP === 'true') {
+      console.log('Ejecutando en build de Vercel, devolviendo datos simulados')
+      return NextResponse.json({
+        role: 'ADMIN',
+        stats: {
+          totalOrders: 0,
+          pendingOrders: 0,
+          preparingOrders: 0,
+          readyOrders: 0,
+          deliveredOrders: 0,
+          totalSales: 0
+        }
+      })
+    }
     // Obtener token de autorización
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
