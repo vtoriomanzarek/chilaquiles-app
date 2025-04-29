@@ -1,5 +1,6 @@
 import { Product } from '@/types'
 import { ProductCard } from '../ui/product-card'
+import { useEffect, useState } from 'react';
 
 interface ProductSelectorProps {
   title: string
@@ -9,8 +10,6 @@ interface ProductSelectorProps {
   onProductSelect: (product: Product) => void
   multiSelect?: boolean
 }
-
-import { useEffect, useState } from 'react';
 
 export function ProductSelector({
   title,
@@ -59,7 +58,7 @@ export function ProductSelector({
                 selected={
                   multiSelect && Array.isArray(selectedProduct)
                     ? selectedProduct.some(item => item.id === product.id)
-                    : selectedProduct?.id === product.id
+                    : !Array.isArray(selectedProduct) && selectedProduct?.id === product.id
                 }
                 onSelect={onProductSelect}
               />

@@ -104,9 +104,13 @@ export default function OrderPage() {
   const calculateTotal = () => {
     return Object.entries(selectedProducts).reduce((total, [key, product]) => {
       if (key === 'extras' && Array.isArray(product)) {
-        return total + product.reduce((sum, item) => sum + item.price, 0);
+        return total + product.reduce((sum, item) => sum + (item?.price || 0), 0);
       }
-      return total + (product?.price || 0);
+      // Verificar si product existe y tiene una propiedad price
+      if (product && typeof product === 'object' && 'price' in product) {
+        return total + (product.price || 0);
+      }
+      return total;
     }, 0);
   }
   
